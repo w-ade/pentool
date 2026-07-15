@@ -1,5 +1,6 @@
 {
   "devDependencies": {
+    "@tauri-apps/cli": "^2.11.4",
     "@vue/component-compiler-utils": "^2.1.0",
     "babel-core": "^6.26.3",
     "babel-plugin-transform-async-to-generator": "^6.24.1",
@@ -19,7 +20,9 @@
   },
   "scripts": {
     "build": "rm -rf build; parcel build src/index.pug --out-dir build --no-source-maps --public-url ./",
-    "start": "parcel -p 2000 src/index.pug --out-dir dev"
+    "start": "parcel -p 2000 src/index.pug --out-dir dev",
+    "app:dev": "tauri dev",
+    "app:build": "tauri build"
   },
   "dependencies": {
     "ace-builds": "^1.3.3",

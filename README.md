@@ -5,13 +5,21 @@
 Vector graphics editor with programmable pen tools aiming to be alternative to de facto standards on graphic design tools.
 This tool is built deeply based on [Paper.js](http://paperjs.org). I'd like to take over the phillosophy of [Scriptgrapher].
 
-## Developemnt
+## Development
 
 ```
-git clone https://github.com/baku89/pentool
+git clone https://github.com/w-ade/pentool
 cd pentool
-yarn install
-gulp
+git switch ver-2018
+npm install
+npm start        # dev server on http://localhost:2000
+```
+
+### Desktop app (Tauri)
+
+```
+npm run app:dev     # run the desktop shell against the dev server
+npm run app:build   # build Pentool.app (unsigned, local use)
 ```
 
 ## TODO
