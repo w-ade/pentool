@@ -1,6 +1,7 @@
 {
   "devDependencies": {
     "@vue/component-compiler-utils": "^2.1.0",
+    "babel-core": "^6.26.3",
     "babel-plugin-transform-async-to-generator": "^6.24.1",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-plugin-transform-runtime": "^6.23.0",
@@ -13,6 +14,9 @@
     "vue": "^2.5.16",
     "vue-template-compiler": "^2.5.16"
   },
+  "alias": {
+    "paper": "./node_modules/paper/dist/paper-core.js"
+  },
   "scripts": {
     "build": "rm -rf build; parcel build src/index.pug --out-dir build --no-source-maps --public-url ./",
     "start": "parcel -p 2000 src/index.pug --out-dir dev"
@@ -23,12 +27,12 @@
     "download-as-file": "^1.1.0",
     "download-from-url": "^1.1.1",
     "eventemitter3": "^3.1.0",
-    "hiredis": "^0.5.0",
     "json-beautify": "^1.0.1",
     "lines-intersection": "^1.0.0",
     "localeval": "^15.2.3",
     "mousetrap": "^1.6.2",
     "paper": "^0.11.5",
+    "query-string": "^9.4.1",
     "uid": "^0.0.2",
     "vue-hot-reload-api": "^2.3.0",
     "vue-ls": "^3.1.0"
