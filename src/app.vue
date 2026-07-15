@@ -71,7 +71,6 @@ div
 import paper from "paper";
 import Mousetrap from "mousetrap";
 import downloadAsFile from "download-as-file";
-import queryString from "query-string";
 import axios from "axios";
 import jsonBeautify from "json-beautify";
 
@@ -86,7 +85,7 @@ window.paper = paper;
 export default {
   mounted() {
     // load
-    const { tool_url } = queryString.parse(location.search);
+    const tool_url = new URLSearchParams(location.search).get("tool_url");
 
     if (tool_url) {
       this.loadToolFromURL(tool_url);
