@@ -54,10 +54,16 @@ div
 	ul.menu.settings(v-if='openSettingsMenu' @click='openSettingsMenu = false')
 		li(@click='clearArtboard') Clear All
 		li(@click='exportSVG') Export SVG
+		li(@click='placeTraceImage') Place Trace Image
+		li.trace-opacity(v-if='hasTraceImage' @click.stop='true')
+			| Trace Opacity
+			input(type='range' min='0.05' max='1' step='0.05' v-model.number='traceOpacity')
+		li(v-if='hasTraceImage' @click='clearTraceImage') Clear Trace Image
 		li(@click='resetTools') Reset Tools
 		li(@click='openToolURLPrompt') Load Tool from URL
 		// <li @click='loadTool'>Load Tool</li>
 	.fill(v-if='openSettingsMenu' @click='openSettingsMenu = false')
+	input(type='file' accept='image/*' ref='traceFile' @change='onTraceFileChange' style='display: none')
 </template>
 
 
@@ -116,7 +122,22 @@ export default {
       });
     });
 
+    const traceLayer = new paper.Layer();
+    traceLayer.name = "trace";
+    traceLayer.sendToBack();
+    traceLayer.opacity = this.traceOpacity;
+    this.traceLayer = traceLayer;
+
     activeLayer.activate();
+
+    // trace image drag & drop
+    this.canvas.addEventListener("dragover", e => e.preventDefault());
+    this.canvas.addEventListener("drop", e => {
+      e.preventDefault();
+      if (e.dataTransfer.files.length > 0) {
+        this.loadTraceImage(e.dataTransfer.files[0]);
+      }
+    });
 
     // canvas navigation
     {
@@ -138,6 +159,7 @@ export default {
           const dy = y - py;
 
           layer.translate(dx, dy);
+          this.traceLayer.translate(dx, dy);
           px = x;
           py = y;
         }
@@ -249,10 +271,52 @@ export default {
       this.toolInstances[this.activeToolId].end();
     },
 
+    placeTraceImage() {
+      this.$refs.traceFile.click();
+    },
+
+    onTraceFileChange(e) {
+      if (e.target.files.length > 0) {
+        this.loadTraceImage(e.target.files[0]);
+      }
+      e.target.value = "";
+    },
+
+    loadTraceImage(file) {
+      if (!file || !/^image\//.test(file.type)) return;
+
+      const url = URL.createObjectURL(file);
+      const raster = new paper.Raster(url);
+
+      raster.onLoad = () => {
+        URL.revokeObjectURL(url);
+
+        const bounds = paper.project.view.bounds;
+        const scale = Math.min(
+          1,
+          (bounds.width * 0.9) / raster.width,
+          (bounds.height * 0.9) / raster.height
+        );
+        raster.scale(scale);
+        raster.position = bounds.center;
+      };
+
+      this.traceLayer.removeChildren();
+      this.traceLayer.addChild(raster);
+      this.hasTraceImage = true;
+    },
+
+    clearTraceImage() {
+      this.traceLayer.removeChildren();
+      this.hasTraceImage = false;
+    },
+
     exportSVG() {
+      this.traceLayer.visible = false;
       const svg = paper.project.exportSVG({
         bounds: paper.project.activeLayer.strokeBounds
       });
+      this.traceLayer.visible = true;
       const svgText = svg.outerHTML;
 
       downloadAsFile({
@@ -388,6 +452,8 @@ export default {
       editingParameters: this.JSONStringify(tools[0].parameters),
       activeToolIndex: parseInt(localStorage.getItem("activeToolIndex")) || 0,
       pan: false,
+      hasTraceImage: false,
+      traceOpacity: parseFloat(localStorage.getItem("traceOpacity")) || 0.4,
       showSidebar: true,
       toolEditMode: "code",
       openToolEditorMenu: false,
@@ -431,6 +497,10 @@ export default {
         localStorage.setItem("parametersCache", JSON.stringify(parameters));
       },
       deep: true
+    },
+    traceOpacity(value) {
+      this.traceLayer.opacity = value;
+      localStorage.setItem("traceOpacity", value);
     },
     activeToolIndex(newTool, oldTool) {
       this.switchTool();
