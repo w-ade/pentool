@@ -4,6 +4,10 @@
 </template>
 
 <script>
+import ace from 'ace-builds/src-noconflict/ace'
+import 'ace-builds/src-noconflict/mode-javascript'
+import 'ace-builds/src-noconflict/mode-json'
+import 'ace-builds/src-noconflict/theme-tomorrow_night'
 import uid from 'uid'
 
 export default {
@@ -35,7 +39,9 @@ export default {
 		this.editor.getSession().setOptions({
 			mode: `ace/mode/${lang}`,
 			tabSize: 2,
-			useSoftTabs: false
+			useSoftTabs: false,
+			// syntax-check workers can't be loaded from the bundle
+			useWorker: false
 		})
 
 		this.editor.getSession().on('change', () => {
